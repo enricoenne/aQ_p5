@@ -1,0 +1,24 @@
+html, body
+{
+	position: relative;
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	overscroll-behavior: contain;
+	touch-action: pan-down;
+}
+
+canvas {
+/*	position: absolute;*/
+	width: 100%;
+/*	height: 100vh;*/
+	margin: 0;
+	padding: 0;
+/*	display: flex;
+
+	/* This centers our sketch horizontally. /
+	justify-content: center;
+
+	/* This centers our sketch vertically. /
+	align-items: center;*/
+}
