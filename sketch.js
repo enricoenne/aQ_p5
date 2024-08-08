@@ -1,18 +1,23 @@
-let N;
-//let data;
-let data = [];
-let map = [];
-let level = 0;				//current level
-let number_level;			//how many levels
-let level_min = []			//min number of moves for each level
+let level_list = [];
+let number_level;			// how many levels
+let level_n = [];			// size of each level
+let level_min = [];			// min number of moves for each level
+let level_name = [];		// name of each level
 
-let player = [0, 0, 0]; 	//player coordinates
-let moves = 0;				//how many moves have been done in the current level
+let level_data = [];
+
+let map = [];
+
+let level = 0;				// current level
+
+
+let player = [0, 0, 0]; 	// player coordinates
+let moves = 0;				// how many moves have been done in the current level
 let temp = [0, 0, 0];
 
-let p, e, x, o;
-let wall = 'w';
-let target = 'o';
+let p, e, o;
+let wall = '1';
+let target = '2';
 //empty = ' '
 
 let win = 0;
@@ -29,11 +34,26 @@ let init = [0,0];
 let end = [0, 0];
 let angle = 0;
 
+
+// TO LOAD FILE USE ONLY preload()
 function preload()
 {
-	data = loadStrings('assets/levels.txt')
-		
 	myFont = loadFont('assets/galiver.ttf');
+	
+	level_list = loadStrings('assets/levels/level_list.csv', function(data) {			// reading level list
+		number_level = level_list.length;												// when this is load, load level files
+		for (let l=0; l<number_level; l++){
+			split_data = level_list[l].split(',');
+			level_n[l] = parseInt(split_data[0]);		// size of each level
+			level_min[l] = parseInt(split_data[1]);		// min moves of each level
+			level_name[l] = split_data[2] + '.txt';		// file name of each level
+			
+			level_data[l] = [];
+			loadStrings('assets/levels/' + level_name[l], function(l_data) {
+				level_data[l] = l_data;
+			});
+		}
+	});
 }
 
 function setup() {
@@ -49,10 +69,7 @@ function setup() {
 	tx_size = d/50;
 	
 	textFont(myFont, 36);
-
-	N = parseInt(data[0]);
-	number_level = data.length/(N*N+1);
-
+	
 	p = color(0,50,100);	//player color
 
 
@@ -64,20 +81,24 @@ function setup() {
 	frame[0] = color(100,100,100);
 	frame[1] = color(100,100,100);
 	frame[2] = color(100,100,100);
-
-
+	
+	// level set up
+	
+	
 	for (let l=0; l<number_level; l++){
 		map[l] = [];
-		for (let i=0; i<N; i++) {
-			map[l][i] = [];
-			for (let j=0; j<N; j++) {
-				map[l][i][j] = [];
-				map[l][i][j] = data[l*N*N + l + 1 + i*N + j];	//every level starts with ----------
+	
+		for (let x=0; x<level_n[l]; x++){
+			map[l][x] = [];
+			for (let y=0; y<level_n[l]; y++){
+				map[l][x][y] = [];
+				map[l][x][y] = level_data[l][x*level_n[l]+y].split('');
 			}
 		}
-		level_min[l] = parseInt(data[l*N*N+l]);
+		
 	}
-	level_min[0] = 3;
+	
+	//console.log(map[0][0]);
 	
 	a = PI/3.5;
 	b = -3*PI/4;
@@ -86,6 +107,7 @@ function setup() {
 function draw() {
 	background(30);
 	noStroke();
+
 	
 	if ((temp[0] != player[0]) ||(temp[1] != player[1]) || (temp[2] != player[2])) {
 		for (i=0; i<3; i++)
@@ -138,7 +160,7 @@ function draw() {
 	axes_xy(0, 0);
 	pop();
 
-	if (map[level][player[0]][player[1]][player[2]] == 'o')
+	if (map[level][player[0]][player[1]][player[2]] == target)
 		win = 1;
 
 	if (win == 1)
@@ -168,8 +190,8 @@ function keyPressed() {
 	else if (key == 's')
 		move_x(1);
 	
-	//if (key == 'p')
-	//	start_newlevel();
+	if (key == 'p')
+		start_newlevel();
 	
 	if (key == 0) {
 		player = [0, 0, 0];
@@ -183,6 +205,36 @@ function keyPressed() {
 	return false;
 }
 
+function mousePressed() {
+		init[0] = mouseX;
+	init[1] = mouseY;
+	
+	if (win == 1)
+		start_newlevel();
+}
+
+function mouseReleased() {
+	end[0] = mouseX;
+	end[1] = mouseY;
+	
+	angle = Math.atan((end[1]-init[1])/(end[0]-init[0]));
+	
+	if (end[0] < init[0]) angle += PI;
+	angle += PI/2;
+	
+	if ((angle > PI/6) && (angle < PI/2))
+		move_y(1);
+	else if ((angle > PI/2) && (angle < 5*PI/6))
+		move_z(-1);
+	else if ((angle > 5*PI/6) && (angle < 7*PI/6))
+		move_x(1);
+	else if ((angle > 7*PI/6) && (angle < 3*PI/2))
+		move_y(-1);
+	else if ((angle > 3*PI/2) && (angle < 11*PI/6))
+		move_z(1);
+	else if ((angle > 11*PI/6) || (angle < PI/6))
+		move_x(-1);
+}
 
 function touchStarted() {
 	init[0] = mouseX;
@@ -216,24 +268,24 @@ function touchEnded(event) {
 }
 
 function move_x(n) {
-	while ((player[0]+n >= 0) && (player[0]+n < N))
-		if (map[level][player[0] + n][player[1]][player[2]] != 'w')
+	while ((player[0]+n >= 0) && (player[0]+n < level_n[level]))
+		if (map[level][player[0] + n][player[1]][player[2]] != wall)
 			player[0] += n;
 		else
 			break;
 }
 
 function move_y(n) {
-	while ((player[1]+n >= 0) && (player[1]+n < N))
-		if (map[level][player[0]][player[1] + n][player[2]] != 'w')
+	while ((player[1]+n >= 0) && (player[1]+n < level_n[level]))
+		if (map[level][player[0]][player[1] + n][player[2]] != wall)
 			player[1] += n;
 		else
 			break;
 }
 
 function move_z(n) {
-	while ((player[2]+n >= 0) && (player[2]+n < N))
-		if (map[level][player[0]][player[1]][player[2] + n] != 'w')
+	while ((player[2]+n >= 0) && (player[2]+n < level_n[level]))
+		if (map[level][player[0]][player[1]][player[2] + n] != wall)
 			player[2] += n;
 		else
 			break;
@@ -243,18 +295,18 @@ function show_yz(offset_x, offset_y) {
 	var y, z;
 	var x = player[0];
 	
-	for (y=0; y<N; y++)
-		for (z=0; z<N; z++) {
+	for (y=0; y<level_n[level]; y++)
+		for (z=0; z<level_n[level]; z++) {
 			if ((z == player[2]) && (y == player[1]))
 				fill(p);
-			else if (map[level][x][y][z] == 'o')
+			else if (map[level][x][y][z] == target)
 				fill(o);
-			else if (map[level][x][y][z] == 'w')
+			else if (map[level][x][y][z] == wall)
 				fill(w);
 			else
 				fill(e);
 			
-			rect(z*d/N+offset_x, y*d/N+offset_y, d/N, d/N);
+			rect(z*d/level_n[level]+offset_x, y*d/level_n[level]+offset_y, d/level_n[level], d/level_n[level]);
 	}
 
 }
@@ -263,18 +315,18 @@ function show_zx(offset_x, offset_y) {
 	var z, x;
 	var y = player[1];
 	
-	for (z=0; z<N; z++)
-		for (x=0; x<N; x++) {
+	for (z=0; z<level_n[level]; z++)
+		for (x=0; x<level_n[level]; x++) {
 			if ((z == player[2]) && (x == player[0]))
 				fill(p);
-			else if (map[level][x][y][z] == 'o')
+			else if (map[level][x][y][z] == target)
 				fill(o);
-			else if (map[level][x][y][z] == 'w')
+			else if (map[level][x][y][z] == wall)
 				fill(w);
 			else
 				fill(e);
 			
-			rect(z*d/N+offset_x, x*d/N+offset_y, d/N, d/N);
+			rect(z*d/level_n[level]+offset_x, x*d/level_n[level]+offset_y, d/level_n[level], d/level_n[level]);
 	}
 }
 
@@ -282,18 +334,18 @@ function show_xy(offset_x, offset_y) {
 	var x, y;
 	var z = player[2];
 	
-	for (x=0; x<N; x++)
-		for (y=0; y<N; y++) {
+	for (x=0; x<level_n[level]; x++)
+		for (y=0; y<level_n[level]; y++) {
 			if ((x == player[0]) && (y == player[1]))
 				fill(p);
-			else if (map[level][x][y][z] == 'o')
+			else if (map[level][x][y][z] == target)
 				fill(o);
-			else if (map[level][x][y][z] == 'w')
+			else if (map[level][x][y][z] == wall)
 				fill(w);
 			else
 				fill(e);
 			
-			rect(x*d/N+offset_x, y*d/N+offset_y, d/N, d/N);
+			rect(x*d/level_n[level]+offset_x, y*d/level_n[level]+offset_y, d/level_n[level], d/level_n[level]);
 	}
 }
 
@@ -301,14 +353,14 @@ function axes_yz(offset_x, offset_y) {
 	strokeWeight(3);
 	stroke(0,0,100);		//z direction
 	line(	offset_x,
-		d/(2*N) + player[1]*d/N + offset_y,
+		d/(2*level_n[level]) + player[1]*d/level_n[level] + offset_y,
 		d + offset_x,
-		d/(2*N) + player[1]*d/N + offset_y); 
+		d/(2*level_n[level]) + player[1]*d/level_n[level] + offset_y); 
 	
 	stroke(0,100,0);		//y direction
-	line(	d/(2*N) + player[2]*d/N + offset_x,
+	line(	d/(2*level_n[level]) + player[2]*d/level_n[level] + offset_x,
 		offset_y,
-		d/(2*N) + player[2]*d/N + offset_x,
+		d/(2*level_n[level]) + player[2]*d/level_n[level] + offset_x,
 		d + offset_y);
 }
 
@@ -316,14 +368,14 @@ function axes_zx(offset_x, offset_y) {
 	strokeWeight(3);
 	stroke(0,0,100);		//z direction
 	line(	offset_x,
-		d/(2*N) + player[0]*d/N + offset_y,
+		d/(2*level_n[level]) + player[0]*d/level_n[level] + offset_y,
 		d + offset_x,
-		d/(2*N) + player[0]*d/N + offset_y); 
+		d/(2*level_n[level]) + player[0]*d/level_n[level] + offset_y); 
 	
 	stroke(100,0,0);		//x direction
-	line(	d/(2*N) + player[2]*d/N + offset_x,
+	line(	d/(2*level_n[level]) + player[2]*d/level_n[level] + offset_x,
 		 + offset_y,
-		d/(2*N) + player[2]*d/N + offset_x,
+		d/(2*level_n[level]) + player[2]*d/level_n[level] + offset_x,
 		d + offset_y);
 
 }
@@ -332,14 +384,14 @@ function axes_xy(offset_x, offset_y) {
 	strokeWeight(3);
 	stroke(100,0,0);		//x direction
 	line(	offset_x,
-		d/(2*N) + player[1]*d/N + offset_y,
+		d/(2*level_n[level]) + player[1]*d/level_n[level] + offset_y,
 		d + offset_x,
-		d/(2*N) + player[1]*d/N + offset_y); 
+		d/(2*level_n[level]) + player[1]*d/level_n[level] + offset_y); 
 	
 	stroke(0,100,0);		//y direction
-	line(	d/(2*N) + player[0]*d/N + offset_x,
+	line(	d/(2*level_n[level]) + player[0]*d/level_n[level] + offset_x,
 		offset_y,
-		d/(2*N) + player[0]*d/N + offset_x,
+		d/(2*level_n[level]) + player[0]*d/level_n[level] + offset_x,
 		d + offset_y);
 
 }
