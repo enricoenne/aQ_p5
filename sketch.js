@@ -15,6 +15,9 @@ let player = [0, 0, 0]; 	// player coordinates
 let moves = 0;				// how many moves have been done in the current level
 let temp = [0, 0, 0];
 
+let history = [];
+history[0] = [0, 0, 0];
+
 let p, e, o;
 let wall = '1';
 let target = '2';
@@ -34,10 +37,13 @@ let init = [0,0];
 let end = [0, 0];
 let angle = 0;
 
+let undo_size = [];
+let undo_pos = [];
+let undo_coord = [];
+
 
 // TO LOAD FILE USE ONLY preload()
-function preload()
-{
+function preload() {
 	myFont = loadFont('assets/galiver.ttf');
 	
 	level_list = loadStrings('assets/levels/level_list.csv', function(data) {			// reading level list
@@ -73,18 +79,26 @@ function setup() {
 	p = color(0,50,100);	//player color
 
 
-	e = color(0,0,0);		//' ' = empty cell
+	e = color(0,0,0);		//'0' = empty cell
 	e_active = color(20,20,20)
-	w = color(60,60,60);		//'w' = wall
-	o = color(100,90,0);		//'o' = target
+	w = color(60,60,60);		//'1' = wall
+	o = color(100,90,0);		//'2' = target
 
 	frame[0] = color(100,100,100);
 	frame[1] = color(100,100,100);
 	frame[2] = color(100,100,100);
 	
-	// level set up
+	// BUTTONS
+	
+	// drawing: origin is center of the screen
+	// when getting the mouse coordinates, origin is top left
+	
+	undo_size = [d/4, d/9];
+	undo_pos = [d/4, -d/1.8];
+	undo_coord = [undo_pos[0], undo_pos[0] + undo_size[0], undo_pos[1], undo_pos[1]+undo_size[1]];
 	
 	
+	// levels set up
 	for (let l=0; l<number_level; l++){
 		map[l] = [];
 	
@@ -107,12 +121,14 @@ function setup() {
 function draw() {
 	background(30);
 	noStroke();
-
 	
 	if ((temp[0] != player[0]) ||(temp[1] != player[1]) || (temp[2] != player[2])) {
-		for (i=0; i<3; i++)
-			temp[i] = player[i];
 		moves += 1;
+		history[moves] = [];
+		for (i=0; i<3; i++) {
+			temp[i] = player[i];
+			history[moves][i] = player[i];
+		}
 	}
 	
 	push();
@@ -132,6 +148,20 @@ function draw() {
 	textSize(tx_size*2);
 	text('LEVEL', -d/3, d/2.79);
 	pop();
+	
+	push();
+	fill(0);
+	textAlign(CENTER, TOP);
+	textSize(tx_size*3);
+	if (moves == 0)
+		fill(40);
+	text('undo', d/3, -d/1.9);
+	pop();
+	
+	// undo button
+	//noFill();
+	//stroke(0);
+	//rect(undo_pos[0], undo_pos[1], undo_size[0], undo_size[1]);
 	
 	push();					//upper face
 	translate(0, -d/12, 0);
@@ -190,6 +220,10 @@ function keyPressed() {
 	else if (key == 's')
 		move_x(1);
 	
+	if (key == 'u') {				// I have no idea why I have to decrease moves twice
+		undo();
+	}
+	
 	if (key == 'p')
 		start_newlevel();
 	
@@ -206,11 +240,18 @@ function keyPressed() {
 }
 
 function mousePressed() {
-		init[0] = mouseX;
+	init[0] = mouseX;
 	init[1] = mouseY;
 	
 	if (win == 1)
 		start_newlevel();
+	
+
+	if (mouseX > width/2 + undo_coord[0] && mouseX < width/2 + undo_coord[1] && mouseY > height/2 + undo_coord[2] && mouseY < height/2 + undo_coord[3])
+		undo();
+	//rect(d/5, -d/1.8, d/4, d/7);
+	console.log(mouseX);
+	console.log(mouseY);
 }
 
 function mouseReleased() {
@@ -423,8 +464,20 @@ function start_newlevel() {
 	}
 }
 
+function undo() {
+	if (moves != 0) {				// I have no idea why I have to decrease moves twice
+		moves --;
+		for (i=0; i<3; i++) {
+			player[i] = history[moves][i];
+		}
+		moves --;
+	}
+}
+
 function doubleClicked() {
 	player = [0, 0, 0];
 	temp = [0,0,0];
+	history = [];
+	history[0] = [0, 0, 0];
 	moves = 0;
 }

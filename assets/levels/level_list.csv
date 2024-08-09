@@ -38,29 +38,63 @@
 3,6,3-new-2,hard very fun
 3,9,3-new-22_9,very hard
 3,10,3-new_10,very hard
-4,3,4-old-1,
-4,4,4-old-2,
-4,4,4-old-3,
-4,9,4-old-4,
-4,4,4-old-5,
-4,5,4-old-6,
-4,5,4-old-7,
-4,6,4-old-8,
-4,7,4-old-9,
-4,7,4-old-10,
-4,6,4-old-11,
-4,6,4-old-12,
-4,6,4-old-13,
-4,7,4-old-14,
-4,7,4-old-15,
-4,8,4-old-16,
-4,10,4-old-17,
-4,9,4-old-18,
-4,9,4-old-19,
-4,10,4-old-20,
-4,10,4-old-21,
-4,10,4-old-22,
-4,10,4-old-23,
-4,10,4-old-24,
-4,10,4-old-25,
-4,11,4-old-26,
+4,3,4-old-1,extremely easy
+4,4,4-old-2,extremely easy
+4,5,4-n4334-2_5,extremely easy
+4,4,4-old-5,easy
+4,5,4-old-6,easy
+4,5,4-old-7,easy
+4,9,4-old-4,easy
+4,5,4-n6649-6_5,easy-medium
+4,5,4-n7429-2_5,easy-medium
+4,6,4-old-8,easy-medium
+4,5,4-n4446-7_5,medium
+4,5,4-n6461-0_5,medium
+4,6,4-n4991-3_6,medium
+4,6,4-n7459-5_6,medium
+4,6,4-n9311-9_6,medium
+4,6,4-n9071-0_6,medium
+4,10,4-old-25,medium
+4,5,4-n3113-3_5,medium-hard
+4,6,4-old-11,medium-hard
+4,6,4-old-12,medium-hard
+4,6,4-old-13,medium-hard
+4,7,4-old-10,medium-hard
+4,7,4-old-14,medium-hard
+4,7,4-old-15,medium-hard
+4,8,4-n3822-0_8,medium-hard
+4,8,4-old-16,medium-hard
+4,8,4-n3329-4_8,medium-hard
+4,9,4-old-18,medium-hard
+4,9,4-old-19,medium-hard
+4,9,4-n2890-7_9,medium-hard
+4,10,4-n5620-2_10,medium-hard
+4,10,4-old-22,medium-hard
+4,7,4-old-9,hard
+4,9,4-n7177-3_9,hard
+4,9,4-n4110-4_9,hard
+4,9,4-n4745-5_9,hard
+4,9,4-n9984-9_9,hard
+4,10,4-old-17,hard
+4,10,4-n1320-1_10,hard
+4,10,4-old-20,hard
+4,10,4-old-21,hard
+4,10,4-old-23,hard
+4,10,4-old-24,hard
+4,11,4-old-26,hard
+4,9,4-n6163-0_9,hard
+4,10,4-n8062-8_10,hard
+4,12,4-n6027-1_12,hard
+4,6,4-n7157-1_6,impossible
+4,9,4-n8361-6_9,very hard
+4,8,4-n9609-8_8,extremely hard
+5,5,5-n7750-0_5
+5,5,5-n7694-3_5
+5,5,5-n2804-4_5
+5,6,5-n8950-2_6
+5,7,5-n6621-0_7,medium-hard
+5,9,5-n2265-3_9
+5,9,5-n8150-4_9
+5,10,5-n3376-1_10
+5,10,5-n2109-2_10
+5,11,5-n4072-1_11
